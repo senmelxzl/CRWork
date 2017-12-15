@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">分类垃圾</string>
+    <string name="action_settings_str">设置</string>
+    <string name="settings_title_tip">设置</string>
+    <!-- action for debug start -->
+    <string name="action_client_str">客户端</string>
+    <string name="action_server_str">服务端</string>
+    <string name="action_nfc_str">NFC</string>
+    <!-- action for debug end -->
+    <string name="client">客户端</string>
+    <string name="server">服务端</string>
+    <string name="nfc">NFC</string>
+    <string name="btn_blth_connect">连接设备</string>
+    <string name="btn_blth_visiblity">设置蓝牙可见性</string>
+    <string name="btn_blth_disconnect">断开连接</string>
+    <string name="connect_state_init">未连接</string>
+    <string name="progress_scaning">正在扫描</string>
+    <string name="progress_connecting">正在连接</string>
+    <string name="send">发送</string>
+    <string name="write_tip">请输入数字、字母或汉字</string>
+    <string name="bluetooth_unopened">蓝牙未开启，请先开启蓝牙</string>
+    <string name="denied_required_permission">"权限被拒绝。您可以依次选择 \"设置\"&gt;\"应用\" 来更改权限。</string>
+    <string name="bt_connected_xn">蓝牙已连接</string>
+    <string name="bt_disconnected_xn">蓝牙未连接</string>
+    <string name="connected_success_tip">已连接设备:</string>
+    <string name="bt_unsupported">设备不支持蓝牙？</string>
+    <string name="connected_failed_tip">连接失败</string>
+    <string name="disconnected_device_tip">未连接</string>
+    <string name="bt_data_received_success">数据接收成功:</string>
+    <string name="bt_data_send_success">数据发生成功:</string>
+    <string name="developer_title_tip">开发调试界面</string>
+    <string name="et_bt_connected_name">请输入蓝牙名称</string>
+    <string name="et_bt_connected_address">请输入蓝牙地址</string>
+    <string name="bt_data_received_show">接收到的数据：</string>
+    <string name="xn_weighed_str">称重</string>
+    <string name="btn_upload_weight_str">上传称重</string>
+    <string name="tv_weight_count_tip">公斤</string>
+    <string name="tv_weight_init_tip">--</string>
+
+</resources>

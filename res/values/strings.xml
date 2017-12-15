@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">CR APP</string>
+    <string name="action_settings_str">Settings</string>
+    <string name="settings_title_tip">Settings</string>
+    <!-- action for debug start -->
+    <string name="action_client_str">Client</string>
+    <string name="action_server_str">Server</string>
+    <string name="action_nfc_str">NFC</string>
+    <!-- action for debug end -->
+    <string name="client">Client</string>
+    <string name="server">Server</string>
+    <string name="nfc">NFC</string>
+    <string name="btn_blth_connect">Connect</string>
+    <string name="btn_blth_visiblity">Bluetooth visibility setting</string>
+    <string name="btn_blth_disconnect">Disconnect</string>
+    <string name="connect_state_init">Init State</string>
+    <string name="progress_scaning">Scaning</string>
+    <string name="progress_connecting">Connecting</string>
+    <string name="send">Send</string>
+    <string name="write_tip">Input something</string>
+    <string name="bluetooth_unopened">Bluetooth is unopened, please open the Bluetooth first</string>
+    <string name="denied_required_permission">Permissions denied. You can change them in Settings &gt; Apps.</string>
+    <string name="bt_connected_xn">蓝牙已连接</string>
+    <string name="bt_disconnected_xn">蓝牙未连接</string>
+    <string name="connected_success_tip">已连接到设备：</string>
+    <string name="bt_unsupported">设备不支持蓝牙？</string>
+    <string name="connected_failed_tip">连接失败</string>
+    <string name="disconnected_device_tip">与设备断开连接</string>
+    <string name="bt_data_received_success">数据接收成功:</string>
+    <string name="bt_data_send_success">数据发生成功:</string>
+    <string name="developer_title_tip">开发调试界面</string>
+    <string name="et_bt_connected_name">请输入蓝牙名称</string>
+    <string name="et_bt_connected_address">请输入蓝牙地址</string>
+    <string name="bt_data_received_show">接收到的数据：</string>
+    <string name="xn_weighed_str">称重</string>
+    <string name="xn_report_str">统计</string>
+    <string name="btn_upload_weight_str">Upload</string>
+    <string name="tv_weight_count_tip"> kg</string>
+    <string name="tv_weight_init_tip">--</string>
+
+</resources>

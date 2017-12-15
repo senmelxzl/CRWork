@@ -1,0 +1,31 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="cn.vn.bluetooth.MainActivity" >
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings_str"
+        android:visible="true"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_client"
+        android:orderInCategory="100"
+        android:title="@string/action_client_str"
+        android:visible="false"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_server"
+        android:orderInCategory="100"
+        android:title="@string/action_server_str"
+        android:visible="false"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_nfc"
+        android:orderInCategory="100"
+        android:title="@string/action_nfc_str"
+        android:visible="false"
+        app:showAsAction="never"/>
+
+</menu>
