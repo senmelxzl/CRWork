@@ -14,6 +14,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
@@ -24,7 +25,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
-/**
+/**s
  * home main activity
  * 
  * @author xiezhenlin
@@ -32,7 +33,7 @@ import android.widget.Toast;
  */
 public class MainActivity extends Activity implements OnClickListener {
 	private final static String TAG = "MainActivity";
-	private final static boolean LOGV_ENABLED = false;
+	private final static boolean LOGV_ENABLED = true;
 	private Button mBtnWeigh, mBtnReport;
 	private boolean mAllGranted;
 	private ActivityController mController = NullController.INSTANCE;
@@ -83,6 +84,11 @@ public class MainActivity extends Activity implements OnClickListener {
 			startActivity(server);
 			break;
 		case R.id.action_nfc:
+			NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+			if(nfcAdapter==null){
+				Toast.makeText(getApplicationContext(), getResources().getString(R.string.tip_nfc_notfound), Toast.LENGTH_LONG).show();
+				break;
+			}
 			Intent nfc = new Intent(this, NFCActivity.class);
 			startActivity(nfc);
 			break;

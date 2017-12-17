@@ -47,21 +47,19 @@
         </activity>
         <activity
             android:name="com.xinan.app.debug.NFCActivity"
-            android:launchMode="singleTop" >
-            <intent-filter>
-                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="text/plain" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.nfc.action.TECH_DISCOVERED" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.nfc.action.TECH_DISCOVERED"
-                android:resource="@xml/nfc_tech_filter" />
+			android:configChanges="keyboardHidden|orientation"
+			android:screenOrientation="portrait" android:launchMode="singleTask"
+			android:windowSoftInputMode="adjustUnspecified|stateAlwaysHidden"
+			android:windowBackground="@null" >
+			<intent-filter>
+				<action android:name="android.nfc.action.TECH_DISCOVERED" />
+			</intent-filter>
+			<meta-data android:name="android.nfc.action.TECH_DISCOVERED"
+				android:resource="@xml/nfc_tech_filter" />
+			<intent-filter>
+				<action android:name="android.nfc.action.TAG_DISCOVERED" />
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
         </activity>
         <!-- debug part end -->
     </application>

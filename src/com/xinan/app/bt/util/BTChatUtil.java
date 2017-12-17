@@ -437,6 +437,8 @@ public class BTChatUtil {
 		private final BluetoothSocket mmSocket;
 		private final InputStream mmInStream;
 		private final OutputStream mmOutStream;
+		private StringBuffer sb;
+		private String currentsb="";
 
 		public ConnectedThread(BluetoothSocket socket) {
 			Log.d(TAG, "create ConnectedThread");
@@ -451,23 +453,33 @@ public class BTChatUtil {
 			}
 			mmInStream = tmpIn;
 			mmOutStream = tmpOut;
+			sb =new StringBuffer();
 		}
 
 		public void run() {
 			while (true) {
 				try {
-					byte[] buffer = new byte[128];
+					byte[] buffer = new byte[64];
 					int bytes = mmInStream.read(buffer);
 					String result_bt = new String(buffer, 0, bytes);
 					Log.i(TAG + "init data from bt server", result_bt);
-					if ((result_bt.startsWith(DATA_HEAD_S) || result_bt.startsWith(DATA_HEAD_U))
-							&& result_bt.endsWith(DATA_END)) {
-						Log.i(TAG + "filter data from bt server", result_bt);
+					if(sb.toString().equals("")&&(result_bt.startsWith("S")||result_bt.startsWith("U"))){
+						sb.append(result_bt);
+						Log.i(TAG + "filter data from bt server1", sb.toString());
+					}else if(!sb.toString().equals("")
+							&&(sb.toString().startsWith("S")||sb.toString().startsWith("U"))
+							&&!sb.toString().endsWith("g")){
+						sb.append(result_bt);
+						Log.i(TAG + "filter data from bt server2", sb.toString());
+					}else if ((sb.toString().startsWith(DATA_HEAD_S) || sb.toString().startsWith(DATA_HEAD_U))
+							&& sb.toString().endsWith(DATA_END)) {
+						Log.i(TAG + "filter data from bt server3", sb.toString());
 						Message msg = mHandler.obtainMessage(MESSAGE_READ);
 						Bundle bundle = new Bundle();
-						bundle.putByteArray(READ_MSG, buffer);
+						bundle.putString(READ_MSG, sb.toString().substring(7, 14).trim());
 						msg.setData(bundle);
 						mHandler.sendMessage(msg);
+						sb=new StringBuffer();
 					}
 				} catch (IOException e) {
 					Log.e(TAG, "disconnected", e);

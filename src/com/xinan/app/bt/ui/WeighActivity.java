@@ -32,6 +32,7 @@ import android.widget.Toast;
  */
 public class WeighActivity extends Activity implements OnClickListener {
 	private final static String TAG = "WeighActivity";
+	private boolean LOG_DEBUG=false;
 	public String BLUETOOTH_NAME = "HC-06";
 	public String BLUETOOTH_ADDRESS = "20:17:08:14:93:15";
 	private BluetoothAdapter mBluetoothAdapter;
@@ -46,13 +47,14 @@ public class WeighActivity extends Activity implements OnClickListener {
 	private TextView tv_weight_count;
 	private ProgressDialog mProgressDialog;
 	private BTChatUtil mBlthChatUtil;
+	private String weigh_data="0.00";
 
 	private Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case BTChatUtil.STATE_CONNECTED:
 				String deviceName = msg.getData().getString(BTChatUtil.DEVICE_NAME);
-				mBtConnectState.setText(getResources().getString(R.string.connected_success_tip) + deviceName);
+				mBtConnectState.setText(deviceName);
 				if (mProgressDialog.isShowing()) {
 					mProgressDialog.dismiss();
 				}
@@ -71,21 +73,23 @@ public class WeighActivity extends Activity implements OnClickListener {
 				mBtConnectState.setText(R.string.disconnected_device_tip);
 				break;
 			case BTChatUtil.MESSAGE_READ: {
-				byte[] buf = msg.getData().getByteArray(BTChatUtil.READ_MSG);
-				String str = (new String(buf, 0, buf.length)).trim();
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.bt_data_received_success) + str, Toast.LENGTH_SHORT).show();
+				String str =msg.getData().getString(BTChatUtil.READ_MSG);
+				if(LOG_DEBUG){
+					Toast.makeText(getApplicationContext(),
+						getResources().getString(R.string.bt_data_received_success) + str.substring(7, 14).trim(), Toast.LENGTH_SHORT).show();
+				}
 				Log.i(TAG, str);
-				tv_weight_count.setText(str.substring(7, str.length() - 2).trim()
-						+ getResources().getString(R.string.tv_weight_count_tip));
+				tv_weight_count.setText(str + getResources().getString(R.string.tv_weight_count_tip));
 
 				break;
 			}
 			case BTChatUtil.MESSAGE_WRITE: {
 				byte[] buf = (byte[]) msg.obj;
 				String str = new String(buf, 0, buf.length);
-				Toast.makeText(getApplicationContext(), getResources().getString(R.string.bt_data_send_success) + str,
+				if(LOG_DEBUG){
+					Toast.makeText(getApplicationContext(), getResources().getString(R.string.bt_data_send_success) + str,
 						Toast.LENGTH_SHORT).show();
+				}
 				break;
 			}
 			default:
@@ -103,13 +107,27 @@ public class WeighActivity extends Activity implements OnClickListener {
 		initBluetooth();
 		mBlthChatUtil = BTChatUtil.getInstance(mContext);
 		mBlthChatUtil.registerHandler(mHandler);
+		initConnected();
+	}
+
+	private void initConnected() {
+		// TODO Auto-generated method stub
+		if (mBlthChatUtil.getState() == BTChatUtil.STATE_CONNECTED) {
+			Toast.makeText(mContext, R.string.bt_connected_xn, Toast.LENGTH_SHORT).show();
+		} else {
+			discoveryDevices();
+		}
+		
 	}
 
 	private void initView() {
 		mBtnBluetoothConnect = (Button) findViewById(R.id.btn_blth_weight);
 		mBtnBluetoohDisconnect = (Button) findViewById(R.id.btn_blth_disconnect);
+		mBtnBluetoothConnect.setVisibility(LOG_DEBUG?View.VISIBLE:View.INVISIBLE);
+		mBtnBluetoohDisconnect.setVisibility(LOG_DEBUG?View.VISIBLE:View.INVISIBLE);
 		mBtConnectState = (TextView) findViewById(R.id.tv_connect_state);
 		tv_weight_count = (TextView) findViewById(R.id.tv_weight_count);
+		tv_weight_count.setText(weigh_data + getResources().getString(R.string.tv_weight_count_tip));
 
 		mBtnBluetoothConnect.setOnClickListener(this);
 		mBtnBluetoohDisconnect.setOnClickListener(this);
@@ -156,13 +174,13 @@ public class WeighActivity extends Activity implements OnClickListener {
 			if (mBlthChatUtil.getState() == BTChatUtil.STATE_CONNECTED) {
 				BluetoothDevice device = mBlthChatUtil.getConnectedDevice();
 				if (null != device && null != device.getName()) {
-					mBtConnectState
-							.setText(getResources().getString(R.string.connected_success_tip) + device.getName());
+					mBtConnectState.setText(device.getName());
 				} else {
 					mBtConnectState.setText(R.string.connected_success_tip);
 				}
 			}
 		}
+		tv_weight_count.setText(weigh_data + getResources().getString(R.string.tv_weight_count_tip));
 	}
 
 	@Override

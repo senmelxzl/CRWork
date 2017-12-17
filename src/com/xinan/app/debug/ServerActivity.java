@@ -104,7 +104,6 @@ public class ServerActivity extends Activity implements OnClickListener {
 		mBtnBluetoohDisconnect = (Button) findViewById(R.id.btn_blth_disconnect);
 		mBtnSendMessage = (Button) findViewById(R.id.btn_sendmessage);
 		mEdttMessage = (EditText) findViewById(R.id.edt_message);
-		mEdttMessage.setText("ST,GS,+   0.78kg");
 		mBtConnectState = (TextView) findViewById(R.id.tv_connect_state);
 		mTvChat = (TextView) findViewById(R.id.tv_chat);
 
@@ -197,7 +196,8 @@ public class ServerActivity extends Activity implements OnClickListener {
 			}
 			break;
 		case R.id.btn_sendmessage:
-			String messagesend = mEdttMessage.getText().toString();
+			String messagesend="ST,GS,+   0."+String.valueOf((int)(Math.random()*100))+"kg";
+			mEdttMessage.setText(messagesend);
 			if (null == messagesend || messagesend.length() == 0) {
 				return;
 			}

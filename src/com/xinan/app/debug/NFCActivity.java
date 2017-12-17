@@ -1,134 +1,294 @@
+/* NFCard is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+NFCard is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Wget.  If not, see <http://www.gnu.org/licenses/>.
+
+Additional permission under GNU GPL version 3 section 7 */
+
 package com.xinan.app.debug;
 
-import java.util.Arrays;
+import org.xml.sax.XMLReader;
 
 import com.xinan.app.R;
+import com.xinan.app.nfc.card.CardManager;
+import com.xinan.app.nfc.util.Util;
 
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Resources;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.nfc.NfcAdapter;
-import android.nfc.Tag;
-import android.nfc.tech.Ndef;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.text.ClipboardManager;
+import android.text.Editable;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.TextView;
+import android.widget.Toast;
 
-/**
- * NFC debug activity
- * 
- * @author xiezhenlin
- *
- */
-public class NFCActivity extends BaseNfcActivity {
-	private TextView nfc_received_data;
-	private String mTagText;
+
+public final class NFCActivity extends Activity implements OnClickListener,
+		Html.ImageGetter, Html.TagHandler {
+	private NfcAdapter nfcAdapter;
+	private PendingIntent pendingIntent;
+	private Resources res;
+	private TextView board;
+
+	private enum ContentType {
+		HINT, DATA, MSG
+	}
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		this.setContentView(R.layout.nfc);
-		initview();
-	}
+		setContentView(R.layout.nfcard);
 
-	private void initview() {
-		// TODO Auto-generated method stub
-		nfc_received_data = (TextView) findViewById(R.id.nfc_data);
-	}
+		final Resources res = getResources();
+		this.res = res;
 
-	@Override
-	public void onNewIntent(Intent intent) {
-		// 1.获取Tag对象
-		Tag detectedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-		// 2.获取Ndef的实例
-		Ndef ndef = Ndef.get(detectedTag);
-		if (ndef != null) {
-			mTagText = ndef.getType() + "\nmaxsize:" + ndef.getMaxSize() + "bytes\n\n";
-			readNfcTag(intent);
-		} else {
-			mTagText = "can not received data from card";
-		}
-		nfc_received_data.setText(mTagText);
-	}
+		final View decor = getWindow().getDecorView();
+		final TextView board = (TextView) decor.findViewById(R.id.board);
+		this.board = board;
 
-	/**
-	 * 读取NFC标签文本数据
-	 */
-	private void readNfcTag(Intent intent) {
-		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
-			Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-			NdefMessage msgs[] = null;
-			int contentSize = 0;
-			if (rawMsgs != null) {
-				msgs = new NdefMessage[rawMsgs.length];
-				for (int i = 0; i < rawMsgs.length; i++) {
-					msgs[i] = (NdefMessage) rawMsgs[i];
-					contentSize += msgs[i].toByteArray().length;
-				}
-			}
-			try {
-				if (msgs != null) {
-					NdefRecord record = msgs[0].getRecords()[0];
-					String textRecord = parseTextRecord(record);
-					mTagText += textRecord + "\n\ntext\n" + contentSize + " bytes";
-				}
-			} catch (Exception e) {
-			}
-		}
-	}
+		decor.findViewById(R.id.btnCopy).setOnClickListener(this);
+		decor.findViewById(R.id.btnNfc).setOnClickListener(this);
+		decor.findViewById(R.id.btnExit).setOnClickListener(this);
 
-	/**
-	 * 解析NDEF文本数据，从第三个字节开始，后面的文本数据
-	 * 
-	 * @param ndefRecord
-	 * @return
-	 */
-	public static String parseTextRecord(NdefRecord ndefRecord) {
-		/**
-		 * 判断数据是否为NDEF格式
-		 */
-		// 判断TNF
-		if (ndefRecord.getTnf() != NdefRecord.TNF_WELL_KNOWN) {
-			return null;
+		board.setMovementMethod(LinkMovementMethod.getInstance());
+		board.setFocusable(false);
+		board.setClickable(false);
+		board.setLongClickable(false);
+
+		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+		if(nfcAdapter==null){
+			finish();
 		}
-		// 判断可变的长度的类型
-		if (!Arrays.equals(ndefRecord.getType(), NdefRecord.RTD_TEXT)) {
-			return null;
-		}
-		try {
-			// 获得字节数组，然后进行分析
-			byte[] payload = ndefRecord.getPayload();
-			// 下面开始NDEF文本数据第一个字节，状态字节
-			// 判断文本是基于UTF-8还是UTF-16的，取第一个字节"位与"上16进制的80，16进制的80也就是最高位是1，
-			// 其他位都是0，所以进行"位与"运算后就会保留最高位
-			String textEncoding = ((payload[0] & 0x80) == 0) ? "UTF-8" : "UTF-16";
-			// 3f最高两位是0，第六位是1，所以进行"位与"运算后获得第六位
-			int languageCodeLength = payload[0] & 0x3f;
-			// 下面开始NDEF文本数据第二个字节，语言编码
-			// 获得语言编码
-			String languageCode = new String(payload, 1, languageCodeLength, "US-ASCII");
-			// 下面开始NDEF文本数据后面的字节，解析出文本
-			String textRecord = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1,
-					textEncoding);
-			return textRecord;
-		} catch (Exception e) {
-			throw new IllegalArgumentException();
-		}
+		pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this,
+				getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+
+		onNewIntent(getIntent());
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// TODO Auto-generated method stub
-		return super.onCreateOptionsMenu(menu);
+		getMenuInflater().inflate(R.menu.nfc_menu, menu);
+		return true;
 	}
 
 	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
-		return super.onContextItemSelected(item);
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.clear:
+			showData(null);
+			return true;
+		case R.id.help:
+			showHelp(R.string.info_help);
+			return true;
+		case R.id.about:
+			showHelp(R.string.info_about);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
+	@Override
+	protected void onPause() {
+		super.onPause();
+
+		if (nfcAdapter != null)
+			nfcAdapter.disableForegroundDispatch(this);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		if (nfcAdapter != null)
+			nfcAdapter.enableForegroundDispatch(this, pendingIntent,
+					CardManager.FILTERS, CardManager.TECHLISTS);
+
+		refreshStatus();
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+
+		final Parcelable p = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+		Log.d("NFCTAG", intent.getAction());
+		showData((p != null) ? CardManager.load(p, res) : null);
+	}
+
+	@Override
+	public void onClick(final View v) {
+		switch (v.getId()) {
+		case R.id.btnCopy: {
+			copyData();
+			break;
+		}
+		case R.id.btnNfc: {
+			startActivityForResult(new Intent(
+					android.provider.Settings.ACTION_WIRELESS_SETTINGS), 0);
+			break;
+		}
+		case R.id.btnExit: {
+			finish();
+			break;
+		}
+		default:
+			break;
+		}
+	}
+
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		refreshStatus();
+	}
+
+	private void refreshStatus() {
+		final Resources r = this.res;
+
+		final String tip;
+		if (nfcAdapter == null)
+			tip = r.getString(R.string.tip_nfc_notfound);
+		else if (nfcAdapter.isEnabled())
+			tip = r.getString(R.string.tip_nfc_enabled);
+		else
+			tip = r.getString(R.string.tip_nfc_disabled);
+
+		final StringBuilder s = new StringBuilder(
+				r.getString(R.string.app_name));
+
+		s.append("  --  ").append(tip);
+		setTitle(s);
+
+		final CharSequence text = board.getText();
+		if (text == null || board.getTag() == ContentType.HINT)
+			showHint();
+	}
+
+	private void copyData() {
+		final CharSequence text = board.getText();
+		if (text == null || board.getTag() != ContentType.DATA)
+			return;
+
+		((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE))
+				.setText(text);
+
+		final String msg = res.getString(R.string.msg_copied);
+		final Toast toast = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
+		toast.setGravity(Gravity.CENTER, 0, 0);
+		toast.show();
+	}
+
+	private void showData(String data) {
+		if (data == null || data.length() == 0) {
+			showHint();
+			return;
+		}
+
+		final TextView board = this.board;
+		final Resources res = this.res;
+		
+		final int padding = res.getDimensionPixelSize(R.dimen.pnl_margin);
+		
+		board.setPadding(padding, padding, padding, padding);
+		board.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+		board.setTextSize(res.getDimension(R.dimen.text_small));
+		board.setTextColor(res.getColor(R.color.text_default));
+		board.setGravity(Gravity.NO_GRAVITY);
+		board.setTag(ContentType.DATA);
+		board.setText(Html.fromHtml(data));
+	}
+
+	private void showHelp(int id) {
+		final TextView board = this.board;
+		final Resources res = this.res;
+		
+		final int padding = res.getDimensionPixelSize(R.dimen.pnl_margin);
+		
+		board.setPadding(padding, padding, padding, padding);
+		board.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+		board.setTextSize(res.getDimension(R.dimen.text_small));
+		board.setTextColor(res.getColor(R.color.text_default));
+		board.setGravity(Gravity.NO_GRAVITY);
+		board.setTag(ContentType.MSG);
+		board.setText(Html.fromHtml(res.getString(id), this, this));
+	}
+
+	private void showHint() {
+		final TextView board = this.board;
+		final Resources res = this.res;
+		final String hint;
+		
+		if (nfcAdapter == null)
+			hint = res.getString(R.string.msg_nonfc);
+		else if (nfcAdapter.isEnabled())
+			hint = res.getString(R.string.msg_nocard);
+		else
+			hint = res.getString(R.string.msg_nfcdisabled);
+		
+		final int padding = res.getDimensionPixelSize(R.dimen.text_middle);
+		
+		board.setPadding(padding, padding, padding, padding);
+		board.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
+		board.setTextSize(res.getDimension(R.dimen.text_middle));
+		board.setTextColor(res.getColor(R.color.text_tip));
+		board.setGravity(Gravity.CENTER_VERTICAL);
+		board.setTag(ContentType.HINT);
+		board.setText(Html.fromHtml(hint));
+	}
+
+	@Override
+	public void handleTag(boolean opening, String tag, Editable output,
+			XMLReader xmlReader) {
+		if (!opening && "version".equals(tag)) {
+			try {
+				output.append(getPackageManager().getPackageInfo(
+						getPackageName(), 0).versionName);
+			} catch (NameNotFoundException e) {
+			}
+		}
+	}
+
+	@Override
+	public Drawable getDrawable(String source) {
+		final Resources r = getResources();
+
+		final Drawable ret;
+		final String[] params = source.split(",");
+		if ("icon_main".equals(params[0])) {
+			ret = r.getDrawable(R.drawable.ic_launcher);
+		} else {
+			ret = null;
+		}
+
+		if (ret != null) {
+			final float f = r.getDisplayMetrics().densityDpi / 72f;
+			final int w = (int) (Util.parseInt(params[1], 10, 16) * f + 0.5f);
+			final int h = (int) (Util.parseInt(params[2], 10, 16) * f + 0.5f);
+			ret.setBounds(0, 0, w, h);
+		}
+
+		return ret;
+	}
 }
