@@ -196,7 +196,7 @@ public class ServerActivity extends Activity implements OnClickListener {
 			}
 			break;
 		case R.id.btn_sendmessage:
-			String messagesend="ST,GS,+   0."+String.valueOf((int)(Math.random()*100))+"kg";
+			String messagesend="ST,GS,+   "+String.valueOf((int)(Math.random()*100))+"."+String.valueOf((int)(10+Math.random()*89))+"kg";
 			mEdttMessage.setText(messagesend);
 			if (null == messagesend || messagesend.length() == 0) {
 				return;

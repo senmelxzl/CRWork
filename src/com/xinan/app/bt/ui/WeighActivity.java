@@ -1,9 +1,11 @@
 package com.xinan.app.bt.ui;
 
+import java.text.DecimalFormat;
 import java.util.Set;
 
 import com.xinan.app.R;
 import com.xinan.app.bt.util.BTChatUtil;
+import com.xinan.app.util.LitterUtil;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -20,7 +22,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,22 +35,33 @@ import android.widget.Toast;
  */
 public class WeighActivity extends Activity implements OnClickListener {
 	private final static String TAG = "WeighActivity";
-	private boolean LOG_DEBUG=false;
-	public String BLUETOOTH_NAME = "HC-06";
-	public String BLUETOOTH_ADDRESS = "20:17:08:14:93:15";
+	private boolean LOG_DEBUG = false;
 	private BluetoothAdapter mBluetoothAdapter;
 	private int REQUEST_ENABLE_BT = 1;
 	private Context mContext;
 	private boolean mBTConnected = false;
 
-	private Button mBtnBluetoothConnect;
-	private Button mBtnBluetoohDisconnect;
+	private ImageView mBtnBluetoothConnect;
+	private Button btn_upload_weight;
 
 	private TextView mBtConnectState;
 	private TextView tv_weight_count;
+	private TextView tv_litter_cost;
+	private TextView tv_litter_earning;
+	private TextView tv_litter_type;
+	private TextView tv_user_detect;
+	RelativeLayout rlt_litter_switch;
 	private ProgressDialog mProgressDialog;
 	private BTChatUtil mBlthChatUtil;
-	private String weigh_data="0.00";
+
+	private String weigh_data = "0.00";
+	private Double money_cost = 0.00;
+	private Double money_earning = 0.00;
+	private int litter_type = LitterUtil.LITTER_TYPE_NO_R;
+	private boolean weigh_ready = false;
+	private int userID = 198819;
+	private boolean userdetected = false;
+	private DecimalFormat df = new DecimalFormat("######0.00");
 
 	private Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
@@ -55,6 +69,8 @@ public class WeighActivity extends Activity implements OnClickListener {
 			case BTChatUtil.STATE_CONNECTED:
 				String deviceName = msg.getData().getString(BTChatUtil.DEVICE_NAME);
 				mBtConnectState.setText(deviceName);
+				mBTConnected = true;
+				mBtnBluetoothConnect.setImageResource(R.drawable.ic_bluetooth_connected_black_36dp);
 				if (mProgressDialog.isShowing()) {
 					mProgressDialog.dismiss();
 				}
@@ -63,6 +79,8 @@ public class WeighActivity extends Activity implements OnClickListener {
 				if (mProgressDialog.isShowing()) {
 					mProgressDialog.dismiss();
 				}
+				mBTConnected = false;
+				mBtnBluetoothConnect.setImageResource(R.drawable.ic_bluetooth_disabled_black_36dp);
 				Toast.makeText(getApplicationContext(), getResources().getString(R.string.connected_failed_tip),
 						Toast.LENGTH_SHORT).show();
 				break;
@@ -70,28 +88,30 @@ public class WeighActivity extends Activity implements OnClickListener {
 				if (mProgressDialog.isShowing()) {
 					mProgressDialog.dismiss();
 				}
+				mBTConnected = false;
 				mBtConnectState.setText(R.string.disconnected_device_tip);
+				mBtnBluetoothConnect.setImageResource(R.drawable.ic_bluetooth_disabled_black_36dp);
 				break;
 			case BTChatUtil.MESSAGE_READ: {
-				String str =msg.getData().getString(BTChatUtil.READ_MSG);
-				if(LOG_DEBUG){
+				weigh_data = msg.getData().getString(BTChatUtil.READ_MSG);
+				money_cost = litter_type == 0 ? Double.valueOf(weigh_data).doubleValue() * LitterUtil.LITTER_PRICE_NO_R
+						: 0.00;
+				money_earning = litter_type == 1
+						? Double.valueOf(weigh_data).doubleValue() * LitterUtil.LITTER_PRICE_YES_R : 0.00;
+				if (LOG_DEBUG) {
 					Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.bt_data_received_success) + str.substring(7, 14).trim(), Toast.LENGTH_SHORT).show();
+							getResources().getString(R.string.bt_data_received_success) + weigh_data,
+							Toast.LENGTH_SHORT).show();
 				}
-				Log.i(TAG, str);
-				tv_weight_count.setText(str + getResources().getString(R.string.tv_weight_count_tip));
-
-				break;
-			}
-			case BTChatUtil.MESSAGE_WRITE: {
-				byte[] buf = (byte[]) msg.obj;
-				String str = new String(buf, 0, buf.length);
-				if(LOG_DEBUG){
-					Toast.makeText(getApplicationContext(), getResources().getString(R.string.bt_data_send_success) + str,
-						Toast.LENGTH_SHORT).show();
+				Log.i(TAG, "weight data from BT" + weigh_data);
+				weigh_ready = !weigh_data.equals("0.00");
+				if (weigh_ready) {
+					refeshdata();
 				}
 				break;
 			}
+			case BTChatUtil.MESSAGE_WRITE:
+				break;
 			default:
 				break;
 			}
@@ -108,32 +128,99 @@ public class WeighActivity extends Activity implements OnClickListener {
 		mBlthChatUtil = BTChatUtil.getInstance(mContext);
 		mBlthChatUtil.registerHandler(mHandler);
 		initConnected();
+		detectUserID();
 	}
 
-	private void initConnected() {
-		// TODO Auto-generated method stub
-		if (mBlthChatUtil.getState() == BTChatUtil.STATE_CONNECTED) {
-			Toast.makeText(mContext, R.string.bt_connected_xn, Toast.LENGTH_SHORT).show();
-		} else {
-			discoveryDevices();
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		Log.d(TAG, "onActivityResult request=" + requestCode + " result=" + resultCode);
+		if (requestCode == 1) {
+			if (resultCode == RESULT_OK) {
+
+			} else if (resultCode == RESULT_CANCELED) {
+				finish();
+			}
 		}
-		
 	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+		btn_upload_weight.setEnabled(mBTConnected && weigh_ready && userdetected);
+		if (mBlthChatUtil != null) {
+			if (mBlthChatUtil.getState() == BTChatUtil.STATE_CONNECTED) {
+				BluetoothDevice device = mBlthChatUtil.getConnectedDevice();
+				if (null != device && null != device.getName()) {
+					mBtConnectState.setText(device.getName());
+				} else {
+					mBtConnectState.setText(R.string.connected_success_tip);
+				}
+			}
+		}
+		refeshdata();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		Log.d(TAG, "onDestroy");
+		mBlthChatUtil = null;
+		unregisterReceiver(mBluetoothReceiver);
+	}
+
+	@Override
+	public void onClick(View arg0) {
+		switch (arg0.getId()) {
+		case R.id.btn_blth_connect:
+			if (!mBTConnected) {
+				if (mBlthChatUtil.getState() == BTChatUtil.STATE_CONNECTED) {
+					Toast.makeText(mContext, R.string.bt_connected_xn, Toast.LENGTH_SHORT).show();
+				} else {
+					discoveryDevices();
+				}
+			} else {
+				if (mBlthChatUtil.getState() != BTChatUtil.STATE_CONNECTED) {
+					Toast.makeText(mContext, R.string.bt_disconnected_xn, Toast.LENGTH_SHORT).show();
+				} else {
+					mBlthChatUtil.disconnect();
+				}
+			}
+			break;
+		case R.id.btn_upload_weight:
+			UploadWeight();
+			break;
+		case R.id.rlt_litter_switch:
+			SwitchLitterType();
+			break;
+		default:
+			break;
+		}
+	}
+
+	/**
+	 * init weight view for admin user
+	 */
 	private void initView() {
-		mBtnBluetoothConnect = (Button) findViewById(R.id.btn_blth_weight);
-		mBtnBluetoohDisconnect = (Button) findViewById(R.id.btn_blth_disconnect);
-		mBtnBluetoothConnect.setVisibility(LOG_DEBUG?View.VISIBLE:View.INVISIBLE);
-		mBtnBluetoohDisconnect.setVisibility(LOG_DEBUG?View.VISIBLE:View.INVISIBLE);
+		mBtnBluetoothConnect = (ImageView) findViewById(R.id.btn_blth_connect);
+		rlt_litter_switch = (RelativeLayout) findViewById(R.id.rlt_litter_switch);
+		btn_upload_weight = (Button) findViewById(R.id.btn_upload_weight);
 		mBtConnectState = (TextView) findViewById(R.id.tv_connect_state);
+		tv_user_detect = (TextView) findViewById(R.id.tv_user_detect);
 		tv_weight_count = (TextView) findViewById(R.id.tv_weight_count);
-		tv_weight_count.setText(weigh_data + getResources().getString(R.string.tv_weight_count_tip));
+		tv_litter_type = (TextView) findViewById(R.id.tv_litter_type);
+		tv_litter_cost = (TextView) findViewById(R.id.tv_litter_cost);
+		tv_litter_earning = (TextView) findViewById(R.id.tv_litter_earning);
 
 		mBtnBluetoothConnect.setOnClickListener(this);
-		mBtnBluetoohDisconnect.setOnClickListener(this);
+		btn_upload_weight.setOnClickListener(this);
+		rlt_litter_switch.setOnClickListener(this);
 		mProgressDialog = new ProgressDialog(this);
 	}
 
+	/**
+	 * init Bluetooth
+	 */
 	private void initBluetooth() {
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (mBluetoothAdapter == null) {
@@ -154,65 +241,45 @@ public class WeighActivity extends Activity implements OnClickListener {
 		registerReceiver(mBluetoothReceiver, filter);
 	}
 
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		Log.d(TAG, "onActivityResult request=" + requestCode + " result=" + resultCode);
-		if (requestCode == 1) {
-			if (resultCode == RESULT_OK) {
-
-			} else if (resultCode == RESULT_CANCELED) {
-				finish();
-			}
-		}
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		if (mBlthChatUtil != null) {
-			if (mBlthChatUtil.getState() == BTChatUtil.STATE_CONNECTED) {
-				BluetoothDevice device = mBlthChatUtil.getConnectedDevice();
-				if (null != device && null != device.getName()) {
-					mBtConnectState.setText(device.getName());
-				} else {
-					mBtConnectState.setText(R.string.connected_success_tip);
-				}
-			}
-		}
+	/**
+	 * update view data from bt
+	 */
+	private void refeshdata() {
+		// TODO Auto-generated method stub
 		tv_weight_count.setText(weigh_data + getResources().getString(R.string.tv_weight_count_tip));
+		tv_litter_cost.setText(getResources().getString(R.string.tv_litter_cost_tip) + df.format(money_cost)
+				+ getResources().getString(R.string.tv_litter_money_tip));
+		tv_litter_earning.setText(getResources().getString(R.string.tv_litter_earning_tip) + df.format(money_earning)
+				+ getResources().getString(R.string.tv_litter_money_tip));
 	}
 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		Log.d(TAG, "onDestroy");
-		mBlthChatUtil = null;
-		unregisterReceiver(mBluetoothReceiver);
-	}
-
-	@Override
-	public void onClick(View arg0) {
-		switch (arg0.getId()) {
-		case R.id.btn_blth_weight:
-			if (mBlthChatUtil.getState() == BTChatUtil.STATE_CONNECTED) {
-				Toast.makeText(mContext, R.string.bt_connected_xn, Toast.LENGTH_SHORT).show();
-			} else {
-				discoveryDevices();
-			}
-			break;
-		case R.id.btn_blth_disconnect:
-			if (mBlthChatUtil.getState() != BTChatUtil.STATE_CONNECTED) {
-				Toast.makeText(mContext, R.string.bt_disconnected_xn, Toast.LENGTH_SHORT).show();
-			} else {
-				mBlthChatUtil.disconnect();
-			}
-			break;
-		default:
-			break;
+	/**
+	 * switch litter type
+	 */
+	private void SwitchLitterType() {
+		// TODO Auto-generated method stub
+		if (litter_type == LitterUtil.LITTER_TYPE_NO_R) {
+			litter_type = LitterUtil.LITTER_TYPE_YES_R;
+		} else {
+			litter_type = LitterUtil.LITTER_TYPE_NO_R;
 		}
+		tv_litter_type.setText(getResources()
+				.getString(litter_type == 0 ? R.string.litter_union_type : R.string.litter_recyclable_type));
+		rlt_litter_switch.setBackgroundResource(
+				litter_type == 0 ? R.drawable.weight_background_union : R.drawable.weight_background_recyclable);
 	}
 
+	/**
+	 * do upload data to server
+	 */
+	private void UploadWeight() {
+		// TODO Auto-generated method stub
+		Toast.makeText(mContext, R.string.upload_success, Toast.LENGTH_SHORT).show();
+	}
+
+	/**
+	 * start discovery bt devices
+	 */
 	private void discoveryDevices() {
 		if (mProgressDialog.isShowing()) {
 			mProgressDialog.dismiss();
@@ -242,8 +309,8 @@ public class WeighActivity extends Activity implements OnClickListener {
 
 				String name = scanDevice.getName();
 				String address = scanDevice.getAddress();
-				if ((name != null && name.equals(BLUETOOTH_NAME))
-						|| (address != null && address.equals(BLUETOOTH_ADDRESS))) {
+				if ((name != null && name.equals(BTChatUtil.BLUETOOTH_NAME))
+						|| (address != null && address.equals(BTChatUtil.BLUETOOTH_ADDRESS))) {
 					mBluetoothAdapter.cancelDiscovery();
 					mProgressDialog.setTitle(getResources().getString(R.string.progress_connecting));
 					mBlthChatUtil.connect(scanDevice);
@@ -264,6 +331,29 @@ public class WeighActivity extends Activity implements OnClickListener {
 		Log.d(TAG, "bonded device size =" + devices.size());
 		for (BluetoothDevice bonddevice : devices) {
 			Log.d(TAG, "bonded device name =" + bonddevice.getName() + " address" + bonddevice.getAddress());
+		}
+	}
+
+	/**
+	 * init connection
+	 */
+	private void initConnected() {
+		// TODO Auto-generated method stub
+		if (mBlthChatUtil.getState() == BTChatUtil.STATE_CONNECTED) {
+			Toast.makeText(mContext, R.string.bt_connected_xn, Toast.LENGTH_SHORT).show();
+		} else {
+			discoveryDevices();
+		}
+
+	}
+
+	/**
+	 * detected user cardID
+	 */
+	private void detectUserID() {
+		// TODO Auto-generated method stub
+		if (userID > 0) {
+			userdetected = true;
 		}
 	}
 }

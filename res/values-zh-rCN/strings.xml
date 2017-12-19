@@ -16,6 +16,7 @@
     <string name="btn_blth_visiblity">设置蓝牙可见性</string>
     <string name="btn_blth_disconnect">断开连接</string>
     <string name="connect_state_init">未连接</string>
+    <string name="tv_user_detect_tip">XXX</string>
     <string name="progress_scaning">正在扫描</string>
     <string name="progress_connecting">正在连接</string>
     <string name="send">发送</string>
@@ -35,7 +36,7 @@
     <string name="et_bt_connected_address">请输入蓝牙地址</string>
     <string name="bt_data_received_show">接收到的数据：</string>
     <string name="xn_weighed_str">称重</string>
-    <string name="btn_upload_weight_str">上传称重</string>
+    <string name="btn_upload_weight_str">上传</string>
     <string name="tv_weight_count_tip">公斤</string>
     <string name="tv_weight_init_tip">--</string>
 	<string name="menu_clear">清屏</string>
@@ -105,4 +106,10 @@
 	<div>作者：<a href="mailto:sinpowei@gmail.com">sinpo</a>, 2011.</div>
 	]]>
 	</string>
+    <string name="tv_litter_cost_tip">费用：</string>
+    <string name="tv_litter_earning_tip">收入：</string>
+    <string name="tv_litter_money_tip">元</string>
+    <string name="tv_litter_type_tip">未知类别</string>
+    <string name="litter_union_type">综合垃圾</string>
+    <string name="litter_recyclable_type">可回收</string>
 </resources>

@@ -25,6 +25,8 @@ public class BTChatUtil {
 
 	// server SDP
 	private static final String SERVICE_NAME = "BluetoothChat";
+	public static final String BLUETOOTH_NAME = "HC-06";
+	public static final String BLUETOOTH_ADDRESS = "20:17:08:14:93:15";
 	// uuid SDP
 	private static final UUID SERVICE_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 	// BT adapter
@@ -438,7 +440,7 @@ public class BTChatUtil {
 		private final InputStream mmInStream;
 		private final OutputStream mmOutStream;
 		private StringBuffer sb;
-		private String currentsb="";
+		private String currentsb = "";
 
 		public ConnectedThread(BluetoothSocket socket) {
 			Log.d(TAG, "create ConnectedThread");
@@ -453,7 +455,7 @@ public class BTChatUtil {
 			}
 			mmInStream = tmpIn;
 			mmOutStream = tmpOut;
-			sb =new StringBuffer();
+			sb = new StringBuffer();
 		}
 
 		public void run() {
@@ -463,15 +465,15 @@ public class BTChatUtil {
 					int bytes = mmInStream.read(buffer);
 					String result_bt = new String(buffer, 0, bytes);
 					Log.i(TAG + "init data from bt server", result_bt);
-					if(sb.toString().equals("")&&(result_bt.startsWith("S")||result_bt.startsWith("U"))){
+					if (sb.toString().equals("") && (result_bt.startsWith("S") || result_bt.startsWith("U"))) {
 						sb.append(result_bt);
 						Log.i(TAG + "filter data from bt server1", sb.toString());
-					}else if(!sb.toString().equals("")
-							&&(sb.toString().startsWith("S")||sb.toString().startsWith("U"))
-							&&!sb.toString().endsWith("g")){
+					} else if (!sb.toString().equals("")
+							&& (sb.toString().startsWith("S") || sb.toString().startsWith("U"))
+							&& !sb.toString().endsWith("g")) {
 						sb.append(result_bt);
 						Log.i(TAG + "filter data from bt server2", sb.toString());
-					}else if ((sb.toString().startsWith(DATA_HEAD_S) || sb.toString().startsWith(DATA_HEAD_U))
+					} else if ((sb.toString().startsWith(DATA_HEAD_S) || sb.toString().startsWith(DATA_HEAD_U))
 							&& sb.toString().endsWith(DATA_END)) {
 						Log.i(TAG + "filter data from bt server3", sb.toString());
 						Message msg = mHandler.obtainMessage(MESSAGE_READ);
@@ -479,7 +481,7 @@ public class BTChatUtil {
 						bundle.putString(READ_MSG, sb.toString().substring(7, 14).trim());
 						msg.setData(bundle);
 						mHandler.sendMessage(msg);
-						sb=new StringBuffer();
+						sb = new StringBuffer();
 					}
 				} catch (IOException e) {
 					Log.e(TAG, "disconnected", e);

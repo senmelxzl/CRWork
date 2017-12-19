@@ -5,58 +5,113 @@
     android:layout_height="match_parent"
     tools:ignore="MergeRootFrame" >
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/status_content_lyt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:orientation="vertical" >
+        android:layout_alignParentTop="true" >
+
+        <TextView
+            android:id="@+id/tv_user_detect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:text="@string/tv_user_detect_tip"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/tv_connect_state"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:layout_margin="5dp"
+            android:gravity="center"
             android:text="@string/connect_state_init"
             android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/btn_blth_connect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_margin="5dp"
+            android:src="@drawable/ic_bluetooth_disabled_black_36dp" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/weight_content_lyt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/status_content_lyt"
+        android:layout_margin="10dp"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:id="@+id/rlt_litter_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:background="@drawable/weight_background_union"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/tv_litter_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="@string/litter_union_type"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_weight_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:gravity="center"
+                android:text="@string/tv_weight_init_tip"
+                android:textSize="25sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp" >
+            android:orientation="horizontal"
+            android:padding="10dp" >
 
-            <Button
-                android:id="@+id/btn_blth_weight"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/tv_litter_cost"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:background="@drawable/bt_connect_background"
-                android:text="@string/btn_blth_connect" />
+                android:gravity="start"
+                android:padding="5dp"
+                android:text="@string/tv_litter_cost_tip"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
 
-            <Button
-                android:id="@+id/btn_blth_disconnect"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/tv_litter_earning"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:background="@drawable/bt_connect_background"
-                android:text="@string/btn_blth_disconnect" />
+                android:gravity="start"
+                android:padding="5dp"
+                android:text="@string/tv_litter_earning_tip"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/tv_weight_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:background="@drawable/weight_background"
-            android:gravity="center"
-            android:text="@string/tv_weight_init_tip"
-            android:textSize="25sp"
-            android:textStyle="bold" />
     </LinearLayout>
 
     <Button
@@ -67,8 +122,9 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="5dp"
         android:background="@drawable/upload_weight_background"
+        android:enabled="false"
         android:text="@string/btn_upload_weight_str"
         android:textColor="@color/black"
-        android:textSize="20sp" />
+        android:textSize="24sp" />
 
 </RelativeLayout>

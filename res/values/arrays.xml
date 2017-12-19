@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="litter_type">
+        <item>@string/litter_union_type</item>
+        <item>@string/litter_recyclable_type</item>
+    </string-array>
+
+</resources>

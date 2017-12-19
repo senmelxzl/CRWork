@@ -45,9 +45,7 @@ import android.view.View.OnClickListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
-public final class NFCActivity extends Activity implements OnClickListener,
-		Html.ImageGetter, Html.TagHandler {
+public final class NFCActivity extends Activity implements OnClickListener, Html.ImageGetter, Html.TagHandler {
 	private NfcAdapter nfcAdapter;
 	private PendingIntent pendingIntent;
 	private Resources res;
@@ -79,11 +77,11 @@ public final class NFCActivity extends Activity implements OnClickListener,
 		board.setLongClickable(false);
 
 		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-		if(nfcAdapter==null){
+		if (nfcAdapter == null) {
 			finish();
 		}
-		pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this,
-				getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+		pendingIntent = PendingIntent.getActivity(this, 0,
+				new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
 		onNewIntent(getIntent());
 	}
@@ -124,8 +122,7 @@ public final class NFCActivity extends Activity implements OnClickListener,
 		super.onResume();
 
 		if (nfcAdapter != null)
-			nfcAdapter.enableForegroundDispatch(this, pendingIntent,
-					CardManager.FILTERS, CardManager.TECHLISTS);
+			nfcAdapter.enableForegroundDispatch(this, pendingIntent, CardManager.FILTERS, CardManager.TECHLISTS);
 
 		refreshStatus();
 	}
@@ -135,7 +132,7 @@ public final class NFCActivity extends Activity implements OnClickListener,
 		super.onNewIntent(intent);
 
 		final Parcelable p = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-		Log.d("NFCTAG", intent.getAction());
+		Log.d("NFCTAG", intent != null ? intent.getAction() : "no intent");
 		showData((p != null) ? CardManager.load(p, res) : null);
 	}
 
@@ -147,8 +144,7 @@ public final class NFCActivity extends Activity implements OnClickListener,
 			break;
 		}
 		case R.id.btnNfc: {
-			startActivityForResult(new Intent(
-					android.provider.Settings.ACTION_WIRELESS_SETTINGS), 0);
+			startActivityForResult(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS), 0);
 			break;
 		}
 		case R.id.btnExit: {
@@ -175,8 +171,7 @@ public final class NFCActivity extends Activity implements OnClickListener,
 		else
 			tip = r.getString(R.string.tip_nfc_disabled);
 
-		final StringBuilder s = new StringBuilder(
-				r.getString(R.string.app_name));
+		final StringBuilder s = new StringBuilder(r.getString(R.string.app_name));
 
 		s.append("  --  ").append(tip);
 		setTitle(s);
@@ -191,8 +186,7 @@ public final class NFCActivity extends Activity implements OnClickListener,
 		if (text == null || board.getTag() != ContentType.DATA)
 			return;
 
-		((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE))
-				.setText(text);
+		((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setText(text);
 
 		final String msg = res.getString(R.string.msg_copied);
 		final Toast toast = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
@@ -208,9 +202,9 @@ public final class NFCActivity extends Activity implements OnClickListener,
 
 		final TextView board = this.board;
 		final Resources res = this.res;
-		
+
 		final int padding = res.getDimensionPixelSize(R.dimen.pnl_margin);
-		
+
 		board.setPadding(padding, padding, padding, padding);
 		board.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
 		board.setTextSize(res.getDimension(R.dimen.text_small));
@@ -223,9 +217,9 @@ public final class NFCActivity extends Activity implements OnClickListener,
 	private void showHelp(int id) {
 		final TextView board = this.board;
 		final Resources res = this.res;
-		
+
 		final int padding = res.getDimensionPixelSize(R.dimen.pnl_margin);
-		
+
 		board.setPadding(padding, padding, padding, padding);
 		board.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
 		board.setTextSize(res.getDimension(R.dimen.text_small));
@@ -239,16 +233,16 @@ public final class NFCActivity extends Activity implements OnClickListener,
 		final TextView board = this.board;
 		final Resources res = this.res;
 		final String hint;
-		
+
 		if (nfcAdapter == null)
 			hint = res.getString(R.string.msg_nonfc);
 		else if (nfcAdapter.isEnabled())
 			hint = res.getString(R.string.msg_nocard);
 		else
 			hint = res.getString(R.string.msg_nfcdisabled);
-		
+
 		final int padding = res.getDimensionPixelSize(R.dimen.text_middle);
-		
+
 		board.setPadding(padding, padding, padding, padding);
 		board.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
 		board.setTextSize(res.getDimension(R.dimen.text_middle));
@@ -259,12 +253,10 @@ public final class NFCActivity extends Activity implements OnClickListener,
 	}
 
 	@Override
-	public void handleTag(boolean opening, String tag, Editable output,
-			XMLReader xmlReader) {
+	public void handleTag(boolean opening, String tag, Editable output, XMLReader xmlReader) {
 		if (!opening && "version".equals(tag)) {
 			try {
-				output.append(getPackageManager().getPackageInfo(
-						getPackageName(), 0).versionName);
+				output.append(getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
 			} catch (NameNotFoundException e) {
 			}
 		}

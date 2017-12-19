@@ -26,7 +26,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 /**s
- * home main activity
+ * home main activity	
  * 
  * @author xiezhenlin
  *
