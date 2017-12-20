@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.xinan.app.R;
 import com.xinan.app.bt.util.BTChatUtil;
+import com.xinan.app.domain.UserDomain;
 import com.xinan.app.util.LitterUtil;
 
 import android.app.Activity;
@@ -19,6 +20,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -41,15 +44,15 @@ public class WeighActivity extends Activity implements OnClickListener {
 	private Context mContext;
 	private boolean mBTConnected = false;
 
-	private ImageView mBtnBluetoothConnect;
+	private TextView btn_blth_connect_state;
 	private Button btn_upload_weight;
 
-	private TextView mBtConnectState;
+	private TextView tv_user_detect_id;
+	private TextView tv_user_detect_name;
 	private TextView tv_weight_count;
 	private TextView tv_litter_cost;
 	private TextView tv_litter_earning;
 	private TextView tv_litter_type;
-	private TextView tv_user_detect;
 	RelativeLayout rlt_litter_switch;
 	private ProgressDialog mProgressDialog;
 	private BTChatUtil mBlthChatUtil;
@@ -60,17 +63,19 @@ public class WeighActivity extends Activity implements OnClickListener {
 	private int litter_type = LitterUtil.LITTER_TYPE_NO_R;
 	private boolean weigh_ready = false;
 	private int userID = 198819;
+	private String userName = "";
 	private boolean userdetected = false;
 	private DecimalFormat df = new DecimalFormat("######0.00");
+
+	private MenuItem action_bt_connect;
+	private String deviceName;
 
 	private Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case BTChatUtil.STATE_CONNECTED:
-				String deviceName = msg.getData().getString(BTChatUtil.DEVICE_NAME);
-				mBtConnectState.setText(deviceName);
+				deviceName = msg.getData().getString(BTChatUtil.DEVICE_NAME);
 				mBTConnected = true;
-				mBtnBluetoothConnect.setImageResource(R.drawable.ic_bluetooth_connected_black_36dp);
 				if (mProgressDialog.isShowing()) {
 					mProgressDialog.dismiss();
 				}
@@ -80,7 +85,6 @@ public class WeighActivity extends Activity implements OnClickListener {
 					mProgressDialog.dismiss();
 				}
 				mBTConnected = false;
-				mBtnBluetoothConnect.setImageResource(R.drawable.ic_bluetooth_disabled_black_36dp);
 				Toast.makeText(getApplicationContext(), getResources().getString(R.string.connected_failed_tip),
 						Toast.LENGTH_SHORT).show();
 				break;
@@ -89,8 +93,6 @@ public class WeighActivity extends Activity implements OnClickListener {
 					mProgressDialog.dismiss();
 				}
 				mBTConnected = false;
-				mBtConnectState.setText(R.string.disconnected_device_tip);
-				mBtnBluetoothConnect.setImageResource(R.drawable.ic_bluetooth_disabled_black_36dp);
 				break;
 			case BTChatUtil.MESSAGE_READ: {
 				weigh_data = msg.getData().getString(BTChatUtil.READ_MSG);
@@ -115,6 +117,10 @@ public class WeighActivity extends Activity implements OnClickListener {
 			default:
 				break;
 			}
+			btn_blth_connect_state
+					.setText(mBTConnected ? deviceName : getResources().getString(R.string.connect_state_init));
+			action_bt_connect.setIcon(mBTConnected ? R.drawable.ic_bluetooth_connected_white_36dp
+					: R.drawable.ic_bluetooth_disabled_white_36dp);
 		};
 	};
 
@@ -127,7 +133,7 @@ public class WeighActivity extends Activity implements OnClickListener {
 		initBluetooth();
 		mBlthChatUtil = BTChatUtil.getInstance(mContext);
 		mBlthChatUtil.registerHandler(mHandler);
-		initConnected();
+		// initConnected();
 		detectUserID();
 	}
 
@@ -147,15 +153,12 @@ public class WeighActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		btn_upload_weight.setEnabled(mBTConnected && weigh_ready && userdetected);
 		if (mBlthChatUtil != null) {
 			if (mBlthChatUtil.getState() == BTChatUtil.STATE_CONNECTED) {
-				BluetoothDevice device = mBlthChatUtil.getConnectedDevice();
-				if (null != device && null != device.getName()) {
-					mBtConnectState.setText(device.getName());
-				} else {
-					mBtConnectState.setText(R.string.connected_success_tip);
-				}
+				btn_blth_connect_state
+						.setText(mBTConnected ? deviceName : getResources().getString(R.string.connect_state_init));
+				action_bt_connect.setIcon(mBTConnected ? R.drawable.ic_bluetooth_connected_white_36dp
+						: R.drawable.ic_bluetooth_disabled_white_36dp);
 			}
 		}
 		refeshdata();
@@ -198,21 +201,51 @@ public class WeighActivity extends Activity implements OnClickListener {
 		}
 	}
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.weight_menu, menu);
+		action_bt_connect = menu.findItem(R.id.action_bt_connect);
+		action_bt_connect.setIcon(mBTConnected ? R.drawable.ic_bluetooth_connected_white_36dp
+				: R.drawable.ic_bluetooth_disabled_white_36dp);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.action_bt_connect:
+			if (!mBTConnected) {
+				if (mBlthChatUtil.getState() == BTChatUtil.STATE_CONNECTED) {
+					Toast.makeText(mContext, R.string.bt_connected_xn, Toast.LENGTH_SHORT).show();
+				} else {
+					discoveryDevices();
+				}
+			} else {
+				if (mBlthChatUtil.getState() != BTChatUtil.STATE_CONNECTED) {
+					Toast.makeText(mContext, R.string.bt_disconnected_xn, Toast.LENGTH_SHORT).show();
+				} else {
+					mBlthChatUtil.disconnect();
+				}
+			}
+			break;
+		}
+		return true;
+	}
+
 	/**
 	 * init weight view for admin user
 	 */
 	private void initView() {
-		mBtnBluetoothConnect = (ImageView) findViewById(R.id.btn_blth_connect);
+		btn_blth_connect_state = (TextView) findViewById(R.id.btn_blth_connect_state);
 		rlt_litter_switch = (RelativeLayout) findViewById(R.id.rlt_litter_switch);
 		btn_upload_weight = (Button) findViewById(R.id.btn_upload_weight);
-		mBtConnectState = (TextView) findViewById(R.id.tv_connect_state);
-		tv_user_detect = (TextView) findViewById(R.id.tv_user_detect);
+		tv_user_detect_id = (TextView) findViewById(R.id.tv_user_detect_id);
+		tv_user_detect_name = (TextView) findViewById(R.id.tv_user_detect_name);
 		tv_weight_count = (TextView) findViewById(R.id.tv_weight_count);
 		tv_litter_type = (TextView) findViewById(R.id.tv_litter_type);
 		tv_litter_cost = (TextView) findViewById(R.id.tv_litter_cost);
 		tv_litter_earning = (TextView) findViewById(R.id.tv_litter_earning);
 
-		mBtnBluetoothConnect.setOnClickListener(this);
 		btn_upload_weight.setOnClickListener(this);
 		rlt_litter_switch.setOnClickListener(this);
 		mProgressDialog = new ProgressDialog(this);
@@ -251,6 +284,7 @@ public class WeighActivity extends Activity implements OnClickListener {
 				+ getResources().getString(R.string.tv_litter_money_tip));
 		tv_litter_earning.setText(getResources().getString(R.string.tv_litter_earning_tip) + df.format(money_earning)
 				+ getResources().getString(R.string.tv_litter_money_tip));
+		btn_upload_weight.setEnabled(mBTConnected && weigh_ready && userdetected);
 	}
 
 	/**
@@ -352,8 +386,13 @@ public class WeighActivity extends Activity implements OnClickListener {
 	 */
 	private void detectUserID() {
 		// TODO Auto-generated method stub
+		UserDomain mUserDoamain = new UserDomain();
+		userID = mUserDoamain.getUserID();
+		userName = mUserDoamain.getUserName();
 		if (userID > 0) {
 			userdetected = true;
+			tv_user_detect_id.setText(String.valueOf(userID));
+			tv_user_detect_name.setText(userName);
 		}
 	}
 }

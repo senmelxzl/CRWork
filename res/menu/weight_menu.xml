@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/action_bt_connect"
+        android:icon="@drawable/ic_bluetooth_disabled_white_36dp"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="@string/action_settings_str"
+        android:visible="true"/>
+
+</menu>

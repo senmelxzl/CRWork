@@ -15,7 +15,8 @@
     <string name="btn_blth_connect">Connect</string>
     <string name="btn_blth_visiblity">Bluetooth visibility setting</string>
     <string name="btn_blth_disconnect">Disconnect</string>
-    <string name="connect_state_init">Disconnect</string>
+    <string name="connect_state_init">未连接</string>
+    <string name="detected_userid_init">请刷卡</string>
     <string name="tv_user_detect_tip">XXX</string>
     <string name="progress_scaning">Scaning</string>
     <string name="progress_connecting">Connecting</string>

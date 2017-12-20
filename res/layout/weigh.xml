@@ -12,32 +12,36 @@
         android:layout_alignParentTop="true" >
 
         <TextView
-            android:id="@+id/tv_user_detect"
+            android:id="@+id/tv_user_detect_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
             android:layout_margin="5dp"
             android:gravity="center"
             android:text="@string/tv_user_detect_tip"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/tv_connect_state"
+            android:id="@+id/tv_user_detect_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_margin="5dp"
             android:gravity="center"
-            android:text="@string/connect_state_init"
+            android:text="@string/detected_userid_init"
             android:textSize="18sp" />
 
-        <ImageView
-            android:id="@+id/btn_blth_connect"
+        <TextView
+            android:id="@+id/btn_blth_connect_state"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:layout_margin="5dp"
-            android:src="@drawable/ic_bluetooth_disabled_black_36dp" />
+            android:gravity="center"
+            android:text="@string/connect_state_init"
+            android:textSize="18sp" />
     </RelativeLayout>
 
     <LinearLayout
