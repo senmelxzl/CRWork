@@ -8,6 +8,7 @@ package com.xinan.app.domain;
  */
 public class VillageDomain {
 	private int ID;
+	private int villageID;
 	private String villageName;
 	private int belongID;
 	private int statusMark;
@@ -16,6 +17,12 @@ public class VillageDomain {
 	}
 	public void setID(int iD) {
 		ID = iD;
+	}
+	public int getVillageID() {
+		return villageID;
+	}
+	public void setVillageID(int villageID) {
+		this.villageID = villageID;
 	}
 	public String getVillageName() {
 		return villageName;

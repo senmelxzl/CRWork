@@ -15,6 +15,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <uses-feature
         android:name="android.hardware.nfc"
@@ -47,19 +49,24 @@
         </activity>
         <activity
             android:name="com.xinan.app.debug.NFCActivity"
-			android:configChanges="keyboardHidden|orientation"
-			android:screenOrientation="portrait" android:launchMode="singleTask"
-			android:windowSoftInputMode="adjustUnspecified|stateAlwaysHidden"
-			android:windowBackground="@null" >
-			<intent-filter>
-				<action android:name="android.nfc.action.TECH_DISCOVERED" />
-			</intent-filter>
-			<meta-data android:name="android.nfc.action.TECH_DISCOVERED"
-				android:resource="@xml/nfc_tech_filter" />
-			<intent-filter>
-				<action android:name="android.nfc.action.TAG_DISCOVERED" />
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
+            android:configChanges="keyboardHidden|orientation"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:windowBackground="@null"
+            android:windowSoftInputMode="adjustUnspecified|stateAlwaysHidden" >
+            <intent-filter>
+                <action android:name="android.nfc.action.TECH_DISCOVERED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.nfc.action.TECH_DISCOVERED"
+                android:resource="@xml/nfc_tech_filter" />
+
+            <intent-filter>
+                <action android:name="android.nfc.action.TAG_DISCOVERED" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
         <!-- debug part end -->
     </application>

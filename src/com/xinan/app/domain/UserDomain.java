@@ -61,13 +61,4 @@ public class UserDomain {
 	public void setRegisteredDate(String registeredDate) {
 		this.registeredDate = registeredDate;
 	}
-
-	public UserDomain() {
-		this.ID = 20170101;
-		this.userID = 19000101;
-		this.userName = "÷‹”Ω∫Ë";
-		this.villageID = 1;
-		this.userType = 1;
-		this.registeredDate = "2017-12-20";
-	}
 }

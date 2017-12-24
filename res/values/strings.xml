@@ -111,5 +111,15 @@
     <string name="litter_union_type">综合垃圾</string>
     <string name="litter_recyclable_type">可回收</string>
     <string name="upload_success">上传成功</string>
+    <string name="upload_fail">上传失败</string>
+    <string name="litter_is_empty">没有数据可显示</string>
+    <string name="userid_query_hint">请输入用户ID</string>
+    <string name="btn_litter_data_fetch_str">查询</string>
+    <string name="btn_litter_data_fetch_clean_str">清空</string>
+    <string name="report_userID_title_str">用户编号</string>
+    <string name="report_userName_title_str">用户名</string>
+    <string name="report_littertypeID_title_str">垃圾类型</string>
+    <string name="report_weight_title_str">重量</string>
+    <string name="report_litterdate_title_str">日期</string>
 
 </resources>

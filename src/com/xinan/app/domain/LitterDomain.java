@@ -8,37 +8,47 @@ package com.xinan.app.domain;
  */
 public class LitterDomain {
 	private int ID;
-	private String littername;
-	private int litterID;
-	private int weight;
+	private int userID;
+	private int littertypeID;
+	private Double weight;
 	private String litterdate;
+
 	public int getID() {
 		return ID;
 	}
+
 	public void setID(int iD) {
 		ID = iD;
 	}
-	public String getLittername() {
-		return littername;
+
+	public int getUserID() {
+		return userID;
 	}
-	public void setLittername(String littername) {
-		this.littername = littername;
+
+	public void setUserID(int userID) {
+		this.userID = userID;
 	}
-	public int getLitterID() {
-		return litterID;
+
+	public int getLittertypeID() {
+		return littertypeID;
 	}
-	public void setLitterID(int litterID) {
-		this.litterID = litterID;
+
+	public void setLittertypeID(int littertypeID) {
+		this.littertypeID = littertypeID;
 	}
-	public int getWeight() {
+
+	public Double getWeight() {
 		return weight;
 	}
-	public void setWeight(int weight) {
+
+	public void setWeight(Double weight) {
 		this.weight = weight;
 	}
+
 	public String getLitterdate() {
 		return litterdate;
 	}
+
 	public void setLitterdate(String litterdate) {
 		this.litterdate = litterdate;
 	}

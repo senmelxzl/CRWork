@@ -1,12 +1,17 @@
 package com.xinan.app.bt.ui;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Set;
 
 import com.xinan.app.R;
 import com.xinan.app.bt.util.BTChatUtil;
+import com.xinan.app.dao.LitterDao;
+import com.xinan.app.domain.LitterDomain;
 import com.xinan.app.domain.UserDomain;
 import com.xinan.app.util.LitterUtil;
+import com.xinan.app.util.WeightUploadService;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -25,7 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +50,7 @@ public class WeighActivity extends Activity implements OnClickListener {
 
 	private TextView btn_blth_connect_state;
 	private Button btn_upload_weight;
+	private boolean uploaded_success = false;
 
 	private TextView tv_user_detect_id;
 	private TextView tv_user_detect_name;
@@ -60,10 +65,10 @@ public class WeighActivity extends Activity implements OnClickListener {
 	private String weigh_data = "0.00";
 	private Double money_cost = 0.00;
 	private Double money_earning = 0.00;
-	private int litter_type = LitterUtil.LITTER_TYPE_NO_R;
+	private int litter_type_ID = LitterUtil.LITTER_TYPE_NO_R;
 	private boolean weigh_ready = false;
-	private int userID = 198819;
-	private String userName = "";
+	private int userID = 19000102;
+	private String userName = "周咏鸿";
 	private boolean userdetected = false;
 	private DecimalFormat df = new DecimalFormat("######0.00");
 
@@ -96,9 +101,9 @@ public class WeighActivity extends Activity implements OnClickListener {
 				break;
 			case BTChatUtil.MESSAGE_READ: {
 				weigh_data = msg.getData().getString(BTChatUtil.READ_MSG);
-				money_cost = litter_type == 0 ? Double.valueOf(weigh_data).doubleValue() * LitterUtil.LITTER_PRICE_NO_R
-						: 0.00;
-				money_earning = litter_type == 1
+				money_cost = litter_type_ID == 0
+						? Double.valueOf(weigh_data).doubleValue() * LitterUtil.LITTER_PRICE_NO_R : 0.00;
+				money_earning = litter_type_ID == 1
 						? Double.valueOf(weigh_data).doubleValue() * LitterUtil.LITTER_PRICE_YES_R : 0.00;
 				if (LOG_DEBUG) {
 					Toast.makeText(getApplicationContext(),
@@ -107,6 +112,7 @@ public class WeighActivity extends Activity implements OnClickListener {
 				}
 				Log.i(TAG, "weight data from BT" + weigh_data);
 				weigh_ready = !weigh_data.equals("0.00");
+				weigh_ready = true;// debug
 				if (weigh_ready) {
 					refeshdata();
 				}
@@ -157,8 +163,6 @@ public class WeighActivity extends Activity implements OnClickListener {
 			if (mBlthChatUtil.getState() == BTChatUtil.STATE_CONNECTED) {
 				btn_blth_connect_state
 						.setText(mBTConnected ? deviceName : getResources().getString(R.string.connect_state_init));
-				action_bt_connect.setIcon(mBTConnected ? R.drawable.ic_bluetooth_connected_white_36dp
-						: R.drawable.ic_bluetooth_disabled_white_36dp);
 			}
 		}
 		refeshdata();
@@ -284,7 +288,9 @@ public class WeighActivity extends Activity implements OnClickListener {
 				+ getResources().getString(R.string.tv_litter_money_tip));
 		tv_litter_earning.setText(getResources().getString(R.string.tv_litter_earning_tip) + df.format(money_earning)
 				+ getResources().getString(R.string.tv_litter_money_tip));
-		btn_upload_weight.setEnabled(mBTConnected && weigh_ready && userdetected);
+		// btn_upload_weight.setEnabled(mBTConnected && weigh_ready &&
+		// userdetected);
+		btn_upload_weight.setEnabled(true);
 	}
 
 	/**
@@ -292,15 +298,15 @@ public class WeighActivity extends Activity implements OnClickListener {
 	 */
 	private void SwitchLitterType() {
 		// TODO Auto-generated method stub
-		if (litter_type == LitterUtil.LITTER_TYPE_NO_R) {
-			litter_type = LitterUtil.LITTER_TYPE_YES_R;
+		if (litter_type_ID == LitterUtil.LITTER_TYPE_NO_R) {
+			litter_type_ID = LitterUtil.LITTER_TYPE_YES_R;
 		} else {
-			litter_type = LitterUtil.LITTER_TYPE_NO_R;
+			litter_type_ID = LitterUtil.LITTER_TYPE_NO_R;
 		}
 		tv_litter_type.setText(getResources()
-				.getString(litter_type == 0 ? R.string.litter_union_type : R.string.litter_recyclable_type));
+				.getString(litter_type_ID == 0 ? R.string.litter_union_type : R.string.litter_recyclable_type));
 		rlt_litter_switch.setBackgroundResource(
-				litter_type == 0 ? R.drawable.weight_background_union : R.drawable.weight_background_recyclable);
+				litter_type_ID == 0 ? R.drawable.weight_background_union : R.drawable.weight_background_recyclable);
 	}
 
 	/**
@@ -308,7 +314,22 @@ public class WeighActivity extends Activity implements OnClickListener {
 	 */
 	private void UploadWeight() {
 		// TODO Auto-generated method stub
-		Toast.makeText(mContext, R.string.upload_success, Toast.LENGTH_SHORT).show();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date d = new Date();
+		String dateNowStr = sdf.format(d);
+		LitterDomain mLitterDomain = new LitterDomain();
+		mLitterDomain.setUserID(userID);
+		mLitterDomain.setLittertypeID(litter_type_ID);
+		mLitterDomain.setWeight(Double.valueOf(weigh_data).doubleValue());
+		mLitterDomain.setLitterdate(dateNowStr);
+		LitterDao mLitterDao = new LitterDao(this);
+		uploaded_success = mLitterDao.insertLitterData(mLitterDomain);
+		if (uploaded_success) {
+			uploaded_success = false;
+			Toast.makeText(mContext, R.string.upload_success, Toast.LENGTH_SHORT).show();
+		} else {
+			Toast.makeText(mContext, R.string.upload_fail, Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	/**
@@ -386,9 +407,6 @@ public class WeighActivity extends Activity implements OnClickListener {
 	 */
 	private void detectUserID() {
 		// TODO Auto-generated method stub
-		UserDomain mUserDoamain = new UserDomain();
-		userID = mUserDoamain.getUserID();
-		userName = mUserDoamain.getUserName();
 		if (userID > 0) {
 			userdetected = true;
 			tv_user_detect_id.setText(String.valueOf(userID));
