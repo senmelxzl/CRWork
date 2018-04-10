@@ -17,32 +17,39 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:gravity="center"
         android:orientation="horizontal" >
 
         <EditText
             android:id="@+id/userid_fetch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="6"
+            android:layout_weight="7"
+            android:gravity="center"
             android:hint="@string/userid_query_hint" />
 
         <Button
             android:id="@+id/litter_data_fetch_clean"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:text="@string/btn_litter_data_fetch_clean_str" />
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/btn_litter_data_fetch_clean_str"
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/litter_data_fetch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:text="@string/btn_litter_data_fetch_str" />
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/btn_litter_data_fetch_str"
+            android:textSize="14sp" />
     </LinearLayout>
 
     <include
-        android:id="@+id/bolck_titlebar"
+        android:id="@+id/litterdata_title_layout_report"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         layout="@layout/litterdata_title_layout" />

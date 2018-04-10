@@ -109,7 +109,7 @@ public class LitterDao {
 				LitterDomain mLitterDomain = new LitterDomain();
 				String[] list_temp = temp.split(" ");
 				mLitterDomain.setUserID(Integer.parseInt(list_temp[0]));
-				mLitterDomain.setLittertypeID(Integer.parseInt(list_temp[0]));
+				mLitterDomain.setLittertypeID(Integer.parseInt(list_temp[1]));
 				mLitterDomain.setWeight(Double.parseDouble(list_temp[2]));
 				mLitterDomain.setLitterdate(LitterUtil.getLitterDate());
 				list.add(mLitterDomain);
@@ -143,6 +143,6 @@ public class LitterDao {
 				return false;
 			}
 		}
-		return false;
+		return true;
 	}
 }

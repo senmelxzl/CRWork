@@ -2,8 +2,6 @@ package com.xinan.app.bt.ui;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import com.xinan.app.R;
 import com.xinan.app.adapter.LitterReportAdapter;
@@ -45,7 +43,6 @@ public class UploadLitterDataActivity extends Activity implements OnClickListene
 	private LitterReportAdapter mLitterReportAdapter;
 	private LitterDao mLitterDao;
 	private ArrayList<LitterDomain> mLitterDomainList = null;
-	private List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +105,7 @@ public class UploadLitterDataActivity extends Activity implements OnClickListene
 			if (Mark == STATE_NO_DATA) {
 				ld_upload_content_listdata_empty.setText(getResources().getString(R.string.litterdatafile_empty));
 			} else if (Mark == STATE_NO_DATA_FILE) {
-				ld_upload_content_listdata_empty.setText(getResources().getString(R.string.litterdatafile_not_exsit));
+				ld_file_name.setText(getResources().getString(R.string.litterdatafile_not_exsit));
 			}
 		}
 	}
