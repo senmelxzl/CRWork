@@ -1,17 +1,13 @@
 package com.xinan.app.bt.ui;
 
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Set;
 
 import com.xinan.app.R;
 import com.xinan.app.bt.util.BTChatUtil;
 import com.xinan.app.dao.LitterDao;
 import com.xinan.app.domain.LitterDomain;
-import com.xinan.app.domain.UserDomain;
 import com.xinan.app.util.LitterUtil;
-import com.xinan.app.util.WeightUploadService;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -314,14 +310,11 @@ public class WeighActivity extends Activity implements OnClickListener {
 	 */
 	private void UploadWeight() {
 		// TODO Auto-generated method stub
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Date d = new Date();
-		String dateNowStr = sdf.format(d);
 		LitterDomain mLitterDomain = new LitterDomain();
 		mLitterDomain.setUserID(userID);
 		mLitterDomain.setLittertypeID(litter_type_ID);
 		mLitterDomain.setWeight(Double.valueOf(weigh_data).doubleValue());
-		mLitterDomain.setLitterdate(dateNowStr);
+		mLitterDomain.setLitterdate(LitterUtil.getLitterDate());
 		LitterDao mLitterDao = new LitterDao(this);
 		uploaded_success = mLitterDao.insertLitterData(mLitterDomain);
 		if (uploaded_success) {

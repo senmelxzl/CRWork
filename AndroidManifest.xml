@@ -42,6 +42,12 @@
         </activity>
         <activity android:name="com.xinan.app.bt.ui.SettingsActivity" >
         </activity>
+        <activity
+            android:name="com.xinan.app.bt.ui.UploadLitterDataActivity"
+            android:label="@string/litterdata_upload_title" >
+        </activity>
+        <activity android:name="com.xinan.app.bt.ui.FileExplorerActivity" >
+        </activity>
         <!-- debug part start -->
         <activity android:name="com.xinan.app.debug.ClientActivity" >
         </activity>

@@ -74,7 +74,9 @@ public class ReportActivity extends Activity implements OnClickListener {
 			userID_fetch = Integer.parseInt(userid_fetch.getText().toString());
 		}
 		mLitterDomainList = mLitterDao.queryLitterData(userID_fetch);
-		mLitterReportAdapter.refresh(mLitterDomainList);
+		if (mLitterDomainList.size() != 0) {
+			mLitterReportAdapter.refresh(mLitterDomainList);
+		}
 	}
 
 	@Override

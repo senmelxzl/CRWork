@@ -27,5 +27,11 @@
         android:title="@string/action_nfc_str"
         android:visible="false"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_analysis"
+        android:orderInCategory="100"
+        android:title="@string/action_analysis_str"
+        android:visible="true"
+        app:showAsAction="never"/>
 
 </menu>

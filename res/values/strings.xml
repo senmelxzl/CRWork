@@ -8,6 +8,7 @@
     <string name="action_client_str">Client</string>
     <string name="action_server_str">Server</string>
     <string name="action_nfc_str">NFC</string>
+    <string name="action_analysis_str">上传</string>
     <!-- action for debug end -->
     <string name="client">Client</string>
     <string name="server">Server</string>
@@ -121,5 +122,11 @@
     <string name="report_littertypeID_title_str">垃圾类型</string>
     <string name="report_weight_title_str">重量</string>
     <string name="report_litterdate_title_str">日期</string>
+    <string name="litterdata_upload_btn_str">选择</string>
+    <string name="litterdata_upload_title">上传</string>
+    <string name="ld_upload_path_title_str">数据文件:</string>
+    <string name="litterdatafilename">请选文件名为:litterdata.txt的数据源文件</string>
+    <string name="litterdatafile_not_exsit">数据源文件未加载，请选择</string>
+    <string name="litterdatafile_empty">数据源文件没有数据</string>
 
 </resources>

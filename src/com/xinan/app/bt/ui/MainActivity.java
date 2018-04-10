@@ -25,15 +25,15 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
-/**s
- * home main activity	
+/**
+ * s home main activity
  * 
  * @author xiezhenlin
  *
  */
 public class MainActivity extends Activity implements OnClickListener {
 	private final static String TAG = "MainActivity";
-	private final static boolean LOGV_ENABLED = true;
+	private final static boolean LOGV_ENABLED = false;
 	private Button mBtnWeigh, mBtnReport;
 	private boolean mAllGranted;
 	private ActivityController mController = NullController.INSTANCE;
@@ -85,12 +85,19 @@ public class MainActivity extends Activity implements OnClickListener {
 			break;
 		case R.id.action_nfc:
 			NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-			if(nfcAdapter==null){
-				Toast.makeText(getApplicationContext(), getResources().getString(R.string.tip_nfc_notfound), Toast.LENGTH_LONG).show();
+			if (nfcAdapter == null) {
+				Toast.makeText(getApplicationContext(), getResources().getString(R.string.tip_nfc_notfound),
+						Toast.LENGTH_LONG).show();
 				break;
 			}
 			Intent nfc = new Intent(this, NFCActivity.class);
 			startActivity(nfc);
+			break;
+		case R.id.action_analysis:// analysis litter data
+			Intent analysis = new Intent(this, UploadLitterDataActivity.class);
+			startActivity(analysis);
+			break;
+		default:
 			break;
 		}
 		return true;

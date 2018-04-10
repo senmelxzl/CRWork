@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:id="@+id/ld_upload_path_llt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/ld_file_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:layout_weight="2"
+            android:text="@string/ld_upload_path_title_str"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/ld_file_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:layout_weight="4"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/ld_loadfile_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="2"
+            android:text="@string/litterdata_upload_btn_str"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <include
+        android:id="@+id/ld_upload_content_listdata_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ld_upload_path_llt"
+        layout="@layout/litterdata_title_layout" />
+
+    <FrameLayout
+        android:id="@+id/ld_upload_content_listdata_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/ld_upload_content_listdata_title" >
+
+        <ListView
+            android:id="@+id/ld_upload_content_listdata"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:visibility="gone" >
+        </ListView>
+
+        <TextView
+            android:id="@+id/ld_upload_content_listdata_empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/litterdatafile_empty"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/ld_upload_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|bottom"
+            android:layout_margin="5dp"
+            android:background="@drawable/upload_weight_background"
+            android:text="@string/btn_upload_weight_str"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:visibility="gone" />
+    </FrameLayout>
+
+</RelativeLayout>
